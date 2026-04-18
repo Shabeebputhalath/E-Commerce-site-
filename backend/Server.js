@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import 'dotenv/config'
 import connectDB from './config/mongodb.js'
+import connectCloudinary from './config/cloudinary.js'
 import userRoutes from './routes/userRoute.js'
 import productRoutes from './routes/productRoute.js'
 
@@ -10,6 +11,9 @@ const app = express()
 const port = process.env.PORT || 4000
 // Connect to DB
 connectDB()
+
+// Connect to Cloudinary
+connectCloudinary()
 
 // middlewares
 app.use(express.json())
