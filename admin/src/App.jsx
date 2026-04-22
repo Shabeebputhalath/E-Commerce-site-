@@ -12,7 +12,7 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const App = () => {
 
-  const [token, setToken] = useState(localStorage.getItem('adminToken') || "")
+  const [token, setToken] = useState(localStorage.getItem('adminToken')? localStorage.getItem('adminToken') : "")
 
   useEffect(() => {
      localStorage.setItem('adminToken', token)
