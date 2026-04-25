@@ -1,8 +1,9 @@
-import React, { use } from 'react'
+import React from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
 import { backendUrl } from '../App'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const Add = () => {
   const [image1, setImage1] = useState(false);
@@ -20,29 +21,55 @@ const Add = () => {
    
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('description', description);
-        formData.append('price', price);
-        formData.append('category', category);
-        formData.append('subCategory', subCategory);
-        formData.append('sizes', JSON.stringify(sizes));
-        formData.append('bestseller', bestseller);
+  try {
+    // 1. Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
 
-        image1 && formData.append('image1', image1);
-        image2 && formData.append('image2', image2);
-        image3 && formData.append('image3', image3);
-        image4 && formData.append('image4', image4);
+    if (!token) {
+      alert("Token not found. Please login again.");
+      return;
+    }
 
-        const response=await axios.post(`${backendUrl}/api/product/add`, formData); 
-        console.log(response);
-  }catch (error) {
-        console.log(error);
-        alert(error.message);
-    }}
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('category', category);
+    formData.append('subCategory', subCategory);
+    formData.append('sizes', JSON.stringify(sizes));
+    formData.append('bestseller', bestseller);
+
+    image1 && formData.append('image1', image1);
+    image2 && formData.append('image2', image2);
+    image3 && formData.append('image3', image3);
+    image4 && formData.append('image4', image4);
+
+    // 2. Pass the token in the headers
+    const response = await axios.post(backendUrl + "/api/product/add", formData, { 
+      headers: {token} 
+    });
+
+    if (response.data.success) {
+      toast.success(response.data.message);
+      // Optional: Reset state here to clear form
+      setName('');
+      setDescription('');
+      setPrice('');
+      setImage1(false);
+      setImage2(false);
+      setImage3(false);
+      setImage4(false);
+    } else {
+      toast.error(response.data.message);
+    }
+
+  } catch (error) {
+    console.log(error);
+    toast.error(error.message);
+  }
+}
   
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3'>
