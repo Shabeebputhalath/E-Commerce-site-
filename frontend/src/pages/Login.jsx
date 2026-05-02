@@ -1,12 +1,52 @@
 import React, { useState } from 'react'
+import { useContext } from 'react';
+import { toast } from 'react-toastify';
+import { ShopContext } from '../context/ShopContext';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 const Login = () => {
 
   const [currentState, setCurrentState] = useState('Sign Up');
+  const {token,setToken,backendUrl,navigate} =useContext(ShopContext);
+ const [name,setName] = useState('');
+ const [email,setEmail] = useState('');
+ const [password,setPassword] = useState('');
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-  }
+    try {
+      if(currentState === 'Sign Up'){
+        const response = await axios.post(backendUrl+'/api/user/register', { name, email, password });
+        const data = response.data;
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('token', data.token);
+          toast.success('Registration successful! Please log in.');
+          
+        } else {
+          toast.error(data.message || 'Registration failed');
+        }
+      }else{
+        const response = await axios.post(backendUrl+'/api/user/login', { email, password });
+        const data = response.data;
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('token', data.token);
+          toast.success('Login successful!');
+        } else {
+          toast.error(data.message || 'Login failed');
+        }
+      }
+    } catch (error) {
+      console.error('Error during submission:', error);
+    }
+  };
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
 
   return (
     <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800'>
@@ -16,9 +56,9 @@ const Login = () => {
         <hr className='border-none h-[1.5px] w-8 bg-gray-800' />
       </div>
 
-      {currentState === 'Login' ? '' : <input type="text" className='w-full px-3 py-2 border border-gray-800' placeholder='Name' required />}
-      <input type="email" className='w-full px-3 py-2 border border-gray-800' placeholder='Email' required />
-      <input type="password" className='w-full px-3 py-2 border border-gray-800' placeholder='Password' required />
+      {currentState === 'Login' ? '' : <input onChange={(e)=>setName(e.target.value)} value={name} type="text" className='w-full px-3 py-2 border border-gray-800' placeholder='Name' required />}
+      <input onChange={(e)=>setEmail(e.target.value)} value={email} type="email" className='w-full px-3 py-2 border border-gray-800' placeholder='Email' required />
+      <input onChange={(e)=>setPassword(e.target.value)} value={password} type="password" className='w-full px-3 py-2 border border-gray-800' placeholder='Password' required />
 
       <div className='w-full flex justify-between text-sm mt-[-8px]'>
         <p className='cursor-pointer'>Forgot your password?</p>

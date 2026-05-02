@@ -1,20 +1,23 @@
 import React, { useEffect } from 'react'
 import { createContext } from "react";
-import { products } from '../assets/assets';
 import { useState } from 'react';
 import{toast} from 'react-toastify';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { use } from 'react';
 
  export const ShopContext = createContext();
  const ShopContextProvider =(props)=>{
     const currency = '₹';
     const delivery_fee=10;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
     const [search,setSearch] =useState('');
     const[showSearch,setShowSearch] = useState(false);
+    const [products,setProducts] = useState([]);
+    const [token,setToken]=useState('');
     const [cartItems, setCartItems] = useState({});
     const navigate=useNavigate();
-
-
     const addToCart =async (itemId,size) => {
     if(!size){
       toast.error('Please select a size before adding to cart');
@@ -77,6 +80,28 @@ import { useNavigate } from 'react-router-dom';
     }
     return totalAmount;
   }
+    const getProducts = async () => {
+        try {
+            const response = await axios.get(backendUrl+'/api/product/list');
+            const data = response.data;
+            if (data.success) {
+                setProducts(data.products); 
+            } else {
+                toast.error('Failed to fetch products');
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            toast.error('An error occurred while fetching products');
+        }
+    }
+    useEffect(() => {
+        getProducts();
+    }, []);
+    useEffect(() => {
+        if (!token && localStorage.getItem('token')) {
+          setToken(localStorage.getItem('token'));
+        }
+        }, [token]);
 
     const value={
         products,
@@ -91,7 +116,10 @@ import { useNavigate } from 'react-router-dom';
         getCartCount,
         updateQuantity,
         getCartAmount,
-        navigate
+        navigate,
+        backendUrl,
+        setToken,
+        token
         
     }
     return(

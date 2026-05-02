@@ -6,7 +6,7 @@ import { ShopContext } from '../context/ShopContext'
 
 function Navbar() {
     const [visible, setVisible] = useState(false);
-    const {setShowSearch, getCartCount} = React.useContext(ShopContext);
+    const {setShowSearch, getCartCount,navigate,token,setToken,setCartItems} = React.useContext(ShopContext);
   return (
     <div className='flex items-center justify-between py-5 font-medium '>
          <Link to='/'><img className='w-36' src={assets.logo} alt="Logo" /></Link>
