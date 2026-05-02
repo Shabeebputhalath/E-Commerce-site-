@@ -5,6 +5,7 @@ import connectDB from './config/mongodb.js'
 import connectCloudinary from './config/cloudinary.js'
 import userRoutes from './routes/userRoute.js'
 import productRoutes from './routes/productRoute.js'
+import cartRoutes from './routes/cartRoute.js'
 
 // App Config
 const app = express()
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 })
 app.use('/api/user', userRoutes)  
 app.use('/api/product', productRoutes)
+app.use('/api/cart', userRoutes)  // Cart routes are handled in userRoutes
 
 
 app.listen(port, () => console.log('Server started on PORT : ' + port));
